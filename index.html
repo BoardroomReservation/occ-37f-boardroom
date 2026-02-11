@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>OCC 37F Boardroom Reservation</title>
+  <style>
+    :root{
+      --brand:#003366; --brand-2:#0055a5; --bg:#f5f7fb; --card:#ffffff;
+      --text:#222; --muted:#667085; --border:#d0d5dd; --error:#c62828;
+      --ok:#1b5e20; --accent:#e9eef7;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--text);}
+    .container{max-width:1000px;margin:32px auto;padding:0 16px;}
+    .header{display:flex;align-items:center;gap:12px;margin-bottom:12px;}
+    .header img.logo{height:48px;width:auto;display:block;}
+    .header h1{margin:0;font-size:26px;color:var(--brand);}
+    .site{margin:0;color:var(--muted);font-size:13px;}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:22px 20px;box-shadow:0 6px 18px rgba(0,0,0,.06);margin-bottom:20px;}
+    .subtitle{margin:0 0 16px;color:var(--muted);}
+    .grid{display:grid;grid-template-columns:1fr;gap:16px;}
+    @media (min-width:720px){.grid-2{grid-template-columns:1fr 1fr;}}
+    label{display:block;font-weight:600;margin-bottom:6px;}
+    .required{color:#d32f2f;margin-left:2px;}
+    input[type="text"],input[type="date"],select,textarea{
+      width:100%;padding:12px;border:1px solid var(--border);border-radius:10px;background:#fff;
+      font-size:14px;outline:none;transition:border .15s ease,box-shadow .15s ease;
+    }
+    input:focus,select:focus,textarea:focus{border-color:var(--brand-2);box-shadow:0 0 0 3px rgba(0,85,165,.12);}
+    textarea{min-height:130px;resize:vertical;}
+    .inline-error{color:var(--error);font-size:12px;margin-top:6px;display:none;}
+    .counter{font-size:12px;color:var(--muted);margin-top:6px;}
+    .success{color:var(--ok);font-size:13px;display:none;margin-top:10px;}
+    button{padding:12px 16px;background:var(--brand);color:#fff;font-weight:700;border:none;border-radius:10px;
+      cursor:pointer;font-size:14px;transition:background .15s ease,transform .05s ease;}
+    button:hover{background:var(--brand-2);}
+    button:active{transform:translateY(1px);}
+    .btn-danger{background:#b3261e;} .btn-danger:hover{background:#d44239;}
+    .btn-secondary{background:#6b7280;} .btn-secondary:hover{background:#80889a;}
+    .table-wrap{border:1px solid var(--border);border-radius:12px;overflow:hidden;background:#fff;}
+    table{width:100%;border-collapse:collapse;font-size:14px;}
+    thead{background:var(--accent);}
+    th,td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:top;}
+    th{text-align:left;color:#1f2a44;font-weight:700;}
+    tr:last-child td{border-bottom:none;}
+    .actions{display:flex;gap:8px;flex-wrap:wrap;}
+    .toolbar{display:flex;justify-content:flex-end;gap:8px;padding:10px 0;}
+    .muted{color:var(--muted);font-size:12px;margin-top:8px;}
+  </style>
+</head>
+<body>
+<div class="container">
+  <!-- Header -->
+  <div class="header">
+    <img
+      class="logo"
+      src="https://www.omegahms.com/wp-content/uploads/2025/01/cropped-cropped-OMH_Logo_Color_R.png"
+      alt="Omega Health Care logo"
+      referrerpolicy="no-referrer"
+      onerror="this.style.display='none'"
+    />
+    <div>
+      <h1>OCC 37F Boardroom Reservation</h1>
+      <p class="site">Omega Health Care — <strong>One Corporate Center</strong> Site</p>
+    </div>
+  </div>
+
+  <!-- Reservation Form -->
+  <div class="card">
+    <p class="subtitle">Reserve the OCC 37F Boardroom.</p>
+    <form id="reservationForm" novalidate>
+      <div class="grid grid-2">
+        <div>
+          <label>Fullname <span class="required">*</span></label>
+          <input type="text" id="fullname" required/>
+          <div class="inline-error" id="fullnameErr">Fullname is required.</div>
+        </div>
+        <div>
+          <label>Employee ID <span class="required">*</span></label>
+          <input type="text" id="employeeId" required/>
+          <div class="inline-error" id="employeeIdErr">Employee ID is required.</div>
+        </div>
+      </div>
+
+      <div class="grid grid-2">
+        <div>
+          <label>Date of Reservation <span class="required">*</span></label>
+          <input type="date" id="date" required/>
+          <div class="inline-error" id="dateErr">Please select a date.</div>
+        </div>
+        <div>
+          <label>Time <span class="required">*</span></label>
+          <div class="grid grid-2">
+            <div>
+              <label>From</label>
+              <select id="startTime" required></select>
+              <div class="inline-error" id="startErr">Select start time.</div>
+            </div>
+            <div>
+              <label>To</label>
+              <select id="endTime" required></select>
+              <div class="inline-error" id="endErr">End time must be after start time.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <label>Purpose (200 words max) <span class="required">*</span></label>
+        <textarea id="purpose" required></textarea>
+        <div class="counter"><span id="wordCount">0</span>/200 words</div>
+        <div class="inline-error" id="purposeErr">Purpose is required and must be ≤ 200 words.</div>
+      </div>
+
+      <div style="display:flex; gap:10px; margin-top:12px;">
+        <button type="submit">Submit Reservation</button>
+        <button type="button" class="btn-secondary" id="resetFormBtn">Reset</button>
+      </div>
+      <div class="success" id="successMsg">✓ Reservation saved.</div>
+    </form>
+  </div>
+
+  <!-- Reservation List -->
+  <div class="card">
+    <h2 style="margin-top:0;">Reservation List</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Fullname</th>
+            <th>Employee ID</th>
+            <th>Date</th>
+            <th>From</th>
+            <th>To</th>
+            <th>Purpose</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="reservationsTbody">
+          <tr><td colspan="7" class="muted" style="padding:14px;">No reservations yet.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="toolbar">
+      <button class="btn-secondary" id="exportXlsBtn">Export Excel</button>
+      <button class="btn-danger" id="clearAllBtn">Clear All</button>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function(){
+  const STORAGE_KEY = "reservations_occ37f";
+
+  // Build "12 AM" .. "11 PM" options
+  const hours = Array.from({ length: 24 }, (_, i) => {
+    const suffix = i < 12 ? "AM" : "PM";
+    const hour = i % 12 === 0 ? 12 : i % 12;
+    return `${hour} ${suffix}`;
+  });
+
+  const startEl = document.getElementById("startTime");
+  const endEl = document.getElementById("endTime");
+
+  function fillTime(select){
+    select.innerHTML = '<option value="">Select time</option>';
+    hours.forEach(h=>{
+      const o = document.createElement("option");
+      o.value = h; o.textContent = h;
+      select.appendChild(o);
+    });
+  }
+  fillTime(startEl);
+  fillTime(endEl);
+
+  // "1 PM" -> 13
+  const to24 = (t) => {
+    if(!t) return null;
+    const [h, ap] = t.split(" ");
+    let hour = parseInt(h, 10);
+    if(ap === "AM"){
+      if(hour === 12) hour = 0;
+    } else {
+      if(hour !== 12) hour += 12;
+    }
+    return hour;
+  };
+
+  // Overlap if [a,b) intersects [c,d)
+  const overlaps = (s1,e1,s2,e2)=>{
+    const a=to24(s1), b=to24(e1), c=to24(s2), d=to24(e2);
+    return a < d && c < b;
+  };
+
+  // Storage helpers
+  const load = () => {
+    try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]"); }
+    catch(_) { return []; }
+  };
+  const save = (data)=>localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+
+  // Word counter
+  const txt = document.getElementById("purpose");
+  const wc = document.getElementById("wordCount");
+  const wordRegex = /\b[\w’'-]+\b/g;
+
+  txt.addEventListener("input", ()=>{
+    const words = (txt.value.match(wordRegex) || []);
+    if(words.length > 200) {
+      txt.value = words.slice(0,200).join(" ");
+    }
+    wc.textContent = (txt.value.match(wordRegex) || []).length;
+  });
+
+  // Render table
+  const tbody = document.getElementById("reservationsTbody");
+
+  function render(){
+    const data = load();
+    tbody.innerHTML = "";
+    if(!data.length){
+      tbody.innerHTML = `<tr><td colspan="7" class="muted" style="padding:14px;">No reservations yet.</td></tr>`;
+      return;
+    }
+
+    data.sort((a,b)=> a.date.localeCompare(b.date) || (to24(a.start) - to24(b.start)));
+
+    data.forEach(r=>{
+      const fullPurpose = r.purpose || "";
+      const words = fullPurpose.trim().split(/\s+/);
+      const short = words.slice(0,25).join(" ");
+      const needsDots = words.length > 25;
+
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${r.fullname}</td>
+        <td>${r.employeeId}</td>
+        <td>${r.date}</td>
+        <td>${r.start}</td>
+        <td>${r.end}</td>
+        <td title="${fullPurpose.replace(/"/g,'&quot;')}">${short}${needsDots ? "…" : ""}</td>
+        <td class="actions">
+          <button class="btn-secondary" data-edit="${r.id}">Edit</button>
+          <button class="btn-danger" data-del="${r.id}">Delete</button>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  // Delegate edit/delete
+  tbody.addEventListener("click",(e)=>{
+    const editId = e.target.getAttribute("data-edit");
+    const delId = e.target.getAttribute("data-del");
+
+    if(editId){
+      const data = load();
+      const r = data.find(x=>x.id===editId);
+      if(!r) return;
+      document.getElementById("fullname").value = r.fullname;
+      document.getElementById("employeeId").value = r.employeeId;
+      document.getElementById("date").value = r.date;
+      document.getElementById("startTime").value = r.start;
+      document.getElementById("endTime").value = r.end;
+      document.getElementById("purpose").value = r.purpose;
+      wc.textContent = (r.purpose.match(wordRegex) || []).length;
+      editing = editId;
+      window.scrollTo({top:0, behavior:"smooth"});
+      return;
+    }
+
+    if(delId){
+      const data = load().filter(r=>r.id!==delId);
+      save(data);
+      render();
+      return;
+    }
+  });
+
+  document.getElementById("clearAllBtn").onclick = ()=>{
+    if(confirm("Clear all reservations for OCC 37F on this device?")) {
+      save([]);
+      render();
+    }
+  };
+
+  document.getElementById("resetFormBtn").onclick = ()=>{
+    form.reset();
+    wc.textContent = "0";
+    document.getElementById("successMsg").style.display="none";
+    editing = null;
+    document.querySelectorAll(".inline-error").forEach(el=>el.style.display="none");
+  };
+
+  let editing = null;
+  const form = document.getElementById("reservationForm");
+
+  form.onsubmit = (e)=>{
+    e.preventDefault();
+    const fullname = document.getElementById("fullname");
+    const employeeId = document.getElementById("employeeId");
+    const date = document.getElementById("date");
+    const start = document.getElementById("startTime");
+    const end = document.getElementById("endTime");
+    const purpose = document.getElementById("purpose");
+
+    const fullnameErr = document.getElementById("fullnameErr");
+    const employeeIdErr = document.getElementById("employeeIdErr");
+    const dateErr = document.getElementById("dateErr");
+    const startErr = document.getElementById("startErr");
+    const endErr = document.getElementById("endErr");
+    const purposeErr = document.getElementById("purposeErr");
+    const successMsg = document.getElementById("successMsg");
+
+    [fullnameErr,employeeIdErr,dateErr,startErr,endErr,purposeErr].forEach(el=>el.style.display="none");
+
+    let valid = true;
+    if(!fullname.value.trim()){fullnameErr.style.display="block"; valid=false;}
+    if(!employeeId.value.trim()){employeeIdErr.style.display="block"; valid=false;}
+    if(!date.value){dateErr.style.display="block"; valid=false;}
+    if(!start.value){startErr.style.display="block"; valid=false;}
+    if(!end.value){endErr.style.display="block"; valid=false;}
+    if(start.value && end.value){
+      if(to24(start.value) >= to24(end.value)){
+        endErr.style.display="block"; valid=false;
+      }
+    }
+    const words = (purpose.value.match(wordRegex) || []).length;
+    if(words===0 || words>200){
+      purposeErr.style.display="block"; valid=false;
+    }
+
+    if(!valid) return;
+
+    const newEntry = {
+      id: editing || Date.now().toString(),
+      fullname: fullname.value.trim(),
+      employeeId: employeeId.value.trim(),
+      date: date.value,
+      start: start.value,
+      end: end.value,
+      purpose: purpose.value.trim()
+    };
+
+    const data = load();
+    const conflict = data.some(r =>
+      r.date===newEntry.date &&
+      r.id!==newEntry.id &&
+      overlaps(r.start,r.end,newEntry.start,newEntry.end)
+    );
+    if(conflict){
+      alert("Conflict detected: Another reservation overlaps this time for OCC 37F.");
+      return;
+    }
+
+    if(editing){
+      const idx = data.findIndex(r=>r.id===editing);
+      if(idx>=0) data[idx] = newEntry;
+      editing = null;
+    } else {
+      data.push(newEntry);
+    }
+    save(data);
+    render();
+    successMsg.style.display="block";
+    form.reset();
+    wc.textContent = "0";
+  };
+
+  // Excel export (.xls via SpreadsheetML)
+  document.getElementById("exportXlsBtn").onclick = ()=>{
+    const rows = load();
+    if(!rows.length){
+      alert("No reservations to export.");
+      return;
+    }
+    const xmlEscape = (s) => String(s ?? "")
+      .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+      .replace(/"/g,'&quot;');
+
+    let xml = `<?xml version="1.0"?>
+<?mso-application progid="Excel.Sheet"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">
+ <Worksheet ss:Name="Reservations">
+  <Table>
+   <Row>
+    <Cell><Data ss:Type="String">Fullname</Data></Cell>
+    <Cell><Data ss:Type="String">Employee ID</Data></Cell>
+    <Cell><Data ss:Type="String">Date</Data></Cell>
+    <Cell><Data ss:Type="String">From</Data></Cell>
+    <Cell><Data ss:Type="String">To</Data></Cell>
+    <Cell><Data ss:Type="String">Purpose</Data></Cell>
+   </Row>`;
+
+    rows.forEach(r=>{
+      xml += `
+   <Row>
+    <Cell><Data ss:Type="String">${xmlEscape(r.fullname)}</Data></Cell>
+    <Cell><Data ss:Type="String">${xmlEscape(r.employeeId)}</Data></Cell>
+    <Cell><Data ss:Type="String">${xmlEscape(r.date)}</Data></Cell>
+    <Cell><Data ss:Type="String">${xmlEscape(r.start)}</Data></Cell>
+    <Cell><Data ss:Type="String">${xmlEscape(r.end)}</Data></Cell>
+    <Cell><Data ss:Type="String">${xmlEscape(r.purpose)}</Data></Cell>
+   </Row>`;
+    });
+
+    xml += `
+  </Table>
+ </Worksheet>
+</Workbook>`;
+
+    const blob = new Blob([xml],{type:"application/vnd.ms-excel"});
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "OCC-37F-Reservations.xls";
+    a.click();
+  };
+
+  render();
+});
+</script>
+</body>
+</html>
